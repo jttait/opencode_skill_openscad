@@ -55,3 +55,9 @@ Use:
 
 ```scad id="qu2fwc"
 $fn = fn;
+```
+
+## Complex shapes
+
+For complex models, compose into sub-modules and compuse using union()
+

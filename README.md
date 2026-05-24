@@ -82,3 +82,45 @@ panel();
 
 [OpenSCAD Playground](https://ochafik.com/openscad2/#H4sIAAAAAAAAA3WTa2+bMBSG/4p1tg/pRnpJu7ajQhPLVKlf1iadxAeCKgdssGNs5EsDzfjvk8mSNrtYQuI8Pu/hvOZ4Aw3WuDYQbgDnlj2TB2wrCOGkEbgrtXKyODY5LiAASrB1mhgIUxD4pRs7yZSELACjnM6HjQ00/9XnSloiLYTwnkoUocuLm4VcyAZLIp5sxfKVJMagCH262dGKsLKyCCEUocnp6Z6vWWErj1GEzga+kJUS5KlguCaW6IHf/IYaF8yZIfkw6QRNBmmtCicIGmqPjtBmIX3pglFKNJE5eWV+5W5JRumbRgL0tttdtHeUHQ0f2cmp0mjUoQilBx5P0EWAJugD+pue/4NmBy35ZTWWRmB72Jv3GKAuQOOz7OhQMHjpBJMF0aMKRX/2jT56qT/KN6fovezE/fa1X8h+/yNHW7PQZwGQtlHa3ipdYzv5BiGY5xIO8fmArYA+gGdG1n4OhSoNhBQLQwIQuFPOelyrgkAItROW+WlUuXtNIwWzSkNotSPbSmQf5c5YVbMXT4b03s+iELgxpJjuN3/gpZ/gbNj0teAd/VxcTXIIwFRqHbd+wrclBZPku6uXRO9a6ANoNNlZWAqnK2z8Rfi5fLwdn/No/KV1dGavkthe0lnr7DUm83vcqpKndIW745hnd4885Wny1cc8U3fze56269UUtzzDLe7mbDVVZRLTB57xlGe4U9Ree8LTOUtiXyuJ6WzIbhVVJZ0lsb3yWv/YazpPYkW9kqeK8hR3SYzb1RT6/heAn0JECwQAAA==)
 
+### Test 3
+
+Prompt: Could you create an OpenSCAD model for a cylinder of length 200 mm and diamter 30 mm? It should also have knurling on half the length.
+
+(Took some further prompting to get the knurling right).
+
+```
+$fn = 64;
+
+CYL_LENGTH = 200;
+CYL_DIAM   = 30;
+CYL_R      = CYL_DIAM / 2;
+
+KNURL_ANGLE = 30;
+KNURL_COUNT = 36;
+KNURL_DEPTH = 0.4;
+KNURL_WIDTH = 0.3;
+
+module knurl_section(h, r) {
+    twist = h * tan(KNURL_ANGLE) / r * 180 / PI;
+
+    module grooves(twist_dir) {
+        linear_extrude(height = h, twist = twist_dir * twist, slices = h * 2)
+            for (i = [0:KNURL_COUNT - 1])
+                rotate([0, 0, i * 360 / KNURL_COUNT])
+                    translate([r - KNURL_DEPTH, 0])
+                        square([KNURL_DEPTH, KNURL_WIDTH]);
+    }
+
+    difference() {
+        cylinder(h = h, r = r);
+        grooves(1);
+        grooves(-1);
+    }
+}
+
+translate([0, 0, CYL_LENGTH / 2])
+    cylinder(h = CYL_LENGTH / 2, r = CYL_R);
+
+knurl_section(CYL_LENGTH / 2, CYL_R);
+```
+
